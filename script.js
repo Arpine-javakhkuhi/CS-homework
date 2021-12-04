@@ -8,24 +8,30 @@ const treeNodes = [
     { parent: 4, id: 6 },
 ];
 
-let expectedObj = {};
-let tmpObj = {};
-let parentId = 0;
-
 function createTree(arr) {
-    arr.forEach((el) => {
-        if (el.parent === null) {
-            Object.assign(tmpObj[el.id] = tmpObj[el.id] || {}, el.id);
+    let expectedObj = {};
+    let parentId = 0;
+    arr.forEach(element => {
+        if (element.parent === null) {
+            expectedObj[element.id] = {};
+        } else {
+            parentId = element.parent;
+            createNode(element, expectedObj, parentId);
         }
-        if (el.parent !== null) {
-            tmpObj[el.parent] = tmpObj[el.parent] || {};
-            tmpObj[el.parent][el.id] = tmpObj[el.parent][el.id] || {};
-            Object.assign(tmpObj[el.parent], tmpObj[el.parent][el.id] || {})
-        }
-        parentId = el.parent;
     });
-    return tmpObj;
+
+    return JSON.stringify(expectedObj);
 }
 
-let result1 = createTree(treeNodes);
-console.log('result', result1);
+function createNode(node, tree, parentId) {
+    for (let branch in tree) {
+        if (branch == node.parent) {
+            tree[branch][node.id] = {};
+        } else {
+            createNode(node, tree[branch], parentId);
+        }
+    }
+}
+
+let result = createTree(treeNodes);
+console.log(`result: ${result}`);
